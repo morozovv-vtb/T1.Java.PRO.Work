@@ -1,9 +1,7 @@
 package T1.homework.task_2;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Task_2 {
 
@@ -83,14 +81,8 @@ public class Task_2 {
         System.out.println("5. Самое длинное слово: " + longestWord); // анеморумбометр
 
         // === Задача 6: Хеш-мапа слово → количество ===
-        // объединяем коллекции с разными фильтрами в одну сроку
-        String text = Stream.of(
-                        Arrays.stream(words),
-                        Arrays.stream(words).filter(w -> w.length() >= 10),
-                        Arrays.stream(words).filter(w -> w.length() > 10)
-                )
-                .flatMap(Function.identity())
-                .collect(Collectors.joining(" "));
+        String text = "коллайдер мультиметр анеморумбометр дихронизатор осцилограф психрометр " +
+                "анеморумбометр дихронизатор осцилограф психрометр мультиметр анеморумбометр дихронизатор";
 
         String[] wordArray = text.split(" ");
 
@@ -113,11 +105,8 @@ public class Task_2 {
         // === Задача 7: Вывести слова по длине + алфавиту ===
         System.out.println("7. Слова по длине и алфавиту:");
         Arrays.stream(words)
-                .sorted((a, b) -> {
-                    if (a.length() != b.length()) return Integer.compare(a.length(), b.length());
-                    return a.compareTo(b);
-                })
-                .forEach(System.out::println);
+                .sorted(Comparator.comparingInt(String::length).thenComparing(String::compareTo))
+                .forEach(System.out::println); // коллайдер мультиметр осцилограф психрометр дихронизатор анеморумбометр
 
         // === Задача 8: Самое длинное слово в массиве строк ===
         String[] lines = {

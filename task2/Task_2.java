@@ -84,23 +84,13 @@ public class Task_2 {
         String text = "коллайдер мультиметр анеморумбометр дихронизатор осцилограф психрометр " +
                 "анеморумбометр дихронизатор осцилограф психрометр мультиметр анеморумбометр дихронизатор";
 
-        String[] wordArray = text.split(" ");
-
-        Map<String, Long> wordCount = Arrays.stream(wordArray)
+        Map<String, Long> wordCount = Arrays.stream(text.split(" "))
                 .collect(Collectors.groupingBy(
-                        w -> w,
-                        Collectors.counting()
-                ))
-                .entrySet()
-                .stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (e1, e2) -> e1,
-                        LinkedHashMap::new
-                ));
-        System.out.println("6. Частота слов: " + wordCount); // {анеморумбометр=3, дихронизатор=3, осцилограф=2, психрометр=2, мультиметр=2, коллайдер=1}
+                        word -> word,
+                        HashMap::new,
+                        Collectors.counting() ));
+
+        System.out.println("6. Частота слов: " + wordCount); // {осцилограф=2, анеморумбометр=3, психрометр=2, коллайдер=1, мультиметр=2, дихронизатор=3}
 
         // === Задача 7: Вывести слова по длине + алфавиту ===
         System.out.println("7. Слова по длине и алфавиту:");

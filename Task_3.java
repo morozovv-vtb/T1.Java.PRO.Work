@@ -41,7 +41,7 @@ public class Task_3 {
 
         public SimThPl(int poolSize) {
             if (poolSize <= 0) {
-                throw new IllegalArgumentException("Размер пула должен быть 0.");
+                throw new IllegalArgumentException("Размер пула должен быть больше 0.");
             }
             this.poolSize = poolSize;
             this.workers = new Thread[poolSize];

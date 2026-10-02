@@ -1,1 +1,1 @@
-"# T1.Java.Learning - ��⮢� �ਬ��" 
+"# T1.Java.Learning — тестовый пример" 

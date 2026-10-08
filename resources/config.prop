@@ -1,0 +1,5 @@
+# Database configuration
+db.url=jdbc:postgresql://localhost:5432/java_db
+db.username=java_user
+db.password=java_pass
+db.driver=org.postgresql.Driver

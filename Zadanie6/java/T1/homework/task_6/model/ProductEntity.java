@@ -20,7 +20,7 @@ public class ProductEntity {
     private BigDecimal balance;
 
     @Column(name = "product_type", nullable = false)
-    private String productType; // "Счет", "Карта"
+    private String productType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

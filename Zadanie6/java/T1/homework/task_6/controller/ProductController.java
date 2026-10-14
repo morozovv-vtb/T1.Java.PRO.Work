@@ -1,78 +1,18 @@
 /*
 package T1.homework.task_6.controller;
 
+import T1.homework.task_6.exception.ProductNotFoundException;
+import T1.homework.task_6.exception.UserNotFoundException;
 import T1.homework.task_6.model.ProductEntity;
 import T1.homework.task_6.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/products")
-public class ProductController {
-
-    @Autowired
-    private ProductService productService;
-
-    // POST /api/products — создать продукт
-    @PostMapping
-    public ResponseEntity<ProductEntity> createProduct(
-            @RequestParam String accountNumber,
-            @RequestParam BigDecimal balance,
-            @RequestParam String productType,
-            @RequestParam Long userId) {
-        ProductEntity product = productService.createProduct(accountNumber, balance, productType, userId);
-        return ResponseEntity.ok(product);
-    }
-
-    // GET /api/products/user/{userId} — получить все продукты пользователя
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ProductEntity>> getProductsByUserId(@PathVariable Long userId) {
-        List<ProductEntity> products = productService.getAllProductsByUserId(userId);
-        return ResponseEntity.ok(products);
-    }
-
-    // GET /api/products/{id} — получить продукт по ID
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductEntity> getProductById(@PathVariable Long id) {
-        Optional<ProductEntity> product = productService.getProductById(id);
-        return product.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // GET /api/products — получить все продукты
-    @GetMapping
-    public ResponseEntity<List<ProductEntity>> getAllProducts() {
-        List<ProductEntity> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
-    }
-
-    // DELETE /api/products/{id}
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
-    }
-}*/
-
-package T1.homework.task_6.controller;
-
-import T1.homework.task_6.model.ProductEntity;
-import T1.homework.task_6.service.ProductService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Optional;
-
-@RestController
-@RequestMapping("/api/products")
-public class ProductController {
+@RequestMapping("/api/v1/products")
+class ProductController {
 
     private final ProductService productService;
 
@@ -80,43 +20,121 @@ public class ProductController {
         this.productService = productService;
     }
 
-    // POST /api/products — создать продукт
+    // POST /api/v1/products — создать продукт
     @PostMapping
-    public ResponseEntity<ProductEntity> createProduct(
+    public ProductEntity createProduct(
             @RequestParam String accountNumber,
             @RequestParam BigDecimal balance,
             @RequestParam String productType,
             @RequestParam Long userId) {
-        ProductEntity product = productService.createProduct(accountNumber, balance, productType, userId);
-        return ResponseEntity.ok(product);
+        return productService.createProduct(accountNumber, balance, productType, userId);
     }
 
-    // GET /api/products/user/{userId} — получить все продукты пользователя
+    // GET /api/v1/products/user/{userId} — получить все продукты пользователя
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ProductEntity>> getProductsByUserId(@PathVariable Long userId) {
+    public List<ProductEntity> getProductsByUserId(@PathVariable Long userId) {
         List<ProductEntity> products = productService.getAllProductsByUserId(userId);
-        return ResponseEntity.ok(products);
+        if (products.isEmpty()) {
+            throw new UserNotFoundException(userId); // или UserNotFoundException — в зависимости от логики
+        }
+        return products;
     }
 
-    // GET /api/products/{id} — получить продукт по ID
+    // GET /api/v1/products/{id} — получить продукт по ID
     @GetMapping("/{id}")
-    public ResponseEntity<ProductEntity> getProductById(@PathVariable Long id) {
-        Optional<ProductEntity> product = productService.getProductById(id);
-        return product.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ProductEntity getProductById(@PathVariable Long id) {
+        return productService.getProductById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
     }
 
-    // GET /api/products — получить все продукты
+    // GET /api/v1/products — получить все продукты
     @GetMapping
-    public ResponseEntity<List<ProductEntity>> getAllProducts() {
-        List<ProductEntity> products = productService.getAllProducts();
-        return ResponseEntity.ok(products);
+    public List<ProductEntity> getAllProducts() {
+        return productService.getAllProducts();
     }
 
-    // DELETE /api/products/{id}
+    // DELETE /api/v1/products/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+    public void deleteProduct(@PathVariable Long id) {
+        if (!productService.getProductById(id).isPresent()) {
+            throw new ProductNotFoundException(id);
+        }
         productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+    }
+}*/
+
+package T1.homework.task_6.controller;
+
+import T1.homework.task_6.exception.ProductNotFoundException;
+import T1.homework.task_6.exception.UserNotFoundException;
+import T1.homework.task_6.model.ProductEntity;
+import T1.homework.task_6.service.ProductService;
+import T1.homework.task_6.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/products")
+public class ProductController {
+
+    private final ProductService productService;
+    private final UserService userService;
+
+    public ProductController(ProductService productService, UserService userService) {
+        this.productService = productService;
+        this.userService = userService;
+    }
+
+    // Централизованная проверка пользователя
+    private void validateUserExists(Long userId) {
+        if (userService.getUserById(userId) == null) {
+            throw new UserNotFoundException(userId);
+        }
+    }
+
+    // POST /api/v1/products — создать продукт
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public ProductEntity createProduct(
+            @RequestParam String accountNumber,
+            @RequestParam BigDecimal balance,
+            @RequestParam String productType,
+            @RequestParam Long userId) {
+
+        validateUserExists(userId);
+        return productService.createProduct(accountNumber, balance, productType, userId);
+    }
+
+    // GET /api/v1/products/user/{userId} — получить все продукты пользователя
+    @GetMapping("/user/{userId}")
+    public List<ProductEntity> getProductsByUserId(@PathVariable Long userId) {
+        validateUserExists(userId);
+        return productService.getAllProductsByUserId(userId);
+    }
+
+    // GET /api/v1/products/{id} — получить продукт по ID
+    @GetMapping("/{id}")
+    public ProductEntity getProductById(@PathVariable Long id) {
+        return productService.getProductById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
+    }
+
+    // GET /api/v1/products — получить все продукты
+    @GetMapping
+    public List<ProductEntity> getAllProducts() {
+        return productService.getAllProducts();
+    }
+
+    // DELETE /api/v1/products/{id}
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteProduct(@PathVariable Long id) {
+        if (!productService.getProductById(id).isPresent()) {
+            throw new ProductNotFoundException(id);
+        }
+        productService.deleteProduct(id);
     }
 }

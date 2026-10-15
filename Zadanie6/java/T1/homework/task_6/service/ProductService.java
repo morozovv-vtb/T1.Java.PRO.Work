@@ -2,13 +2,13 @@ package T1.homework.task_6.service;
 
 import T1.homework.task_6.dto.ProductDto;
 import T1.homework.task_6.exception.UserNotFoundException;
+import T1.homework.task_6.mapper.ProductMapper;
 import T1.homework.task_6.model.ProductEntity;
 import T1.homework.task_6.model.UserEntity;
 import T1.homework.task_6.repository.ProductRepository;
 import T1.homework.task_6.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.stream.Collectors;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,10 +19,15 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final ProductMapper productMapper;
 
-    public ProductService(ProductRepository productRepository, UserRepository userRepository) {
+    // Конструкторная инъекция
+    public ProductService(ProductRepository productRepository,
+                          UserRepository userRepository,
+                          ProductMapper productMapper) {
         this.productRepository = productRepository;
         this.userRepository = userRepository;
+        this.productMapper = productMapper;
     }
 
     @Transactional
@@ -30,17 +35,12 @@ public class ProductService {
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
+        // Используем маппер для создания Entity
         ProductEntity product = new ProductEntity(accountNumber, balance, productType, user);
         ProductEntity saved = productRepository.save(product);
 
-        // Возвращаем DTO — не Entity!
-        return new ProductDto(
-                saved.getId(),
-                saved.getAccountNumber(),
-                saved.getBalance(),
-                saved.getProductType(),
-                saved.getUser().getId()
-        );
+        // Преобразуем Entity в DTO через маппер
+        return productMapper.toDto(saved);
     }
 
     public List<ProductDto> getAllProductsByUserId(Long userId) {
@@ -49,38 +49,17 @@ public class ProductService {
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
         List<ProductEntity> entities = productRepository.findByUserId(userId);
-        return entities.stream()
-                .map(entity -> new ProductDto(
-                        entity.getId(),
-                        entity.getAccountNumber(),
-                        entity.getBalance(),
-                        entity.getProductType(),
-                        entity.getUser().getId()
-                ))
-                .collect(Collectors.toList());
+        // Преобразуем список через маппер
+        return productMapper.toDtoList(entities);
     }
 
     public Optional<ProductDto> getProductById(Long productId) {
         return productRepository.findByIdWithUser(productId)
-                .map(entity -> new ProductDto(
-                        entity.getId(),
-                        entity.getAccountNumber(),
-                        entity.getBalance(),
-                        entity.getProductType(),
-                        entity.getUser().getId()
-                ));
+                .map(productMapper::toDto); // Лямбда-ссылка на метод маппера
     }
 
     public List<ProductDto> getAllProducts() {
-        return productRepository.findAllWithUser().stream()
-                .map(entity -> new ProductDto(
-                        entity.getId(),
-                        entity.getAccountNumber(),
-                        entity.getBalance(),
-                        entity.getProductType(),
-                        entity.getUser().getId()
-                ))
-                .collect(Collectors.toList());
+        return productMapper.toDtoList(productRepository.findAllWithUser()); // ✅ Всё в одной строке
     }
 
     @Transactional

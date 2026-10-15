@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/java_db
+    username: java_user
+    password: java_pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: false
+    locations: classpath:db/migration
+    database: postgresql
+    validate-on-migrate: true
+    baseline-on-migrate: true
+
+# Настройки платежного ядра
+payment-core:
+  product-service-url: http://localhost:8080/api/v1/products

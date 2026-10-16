@@ -30,7 +30,7 @@ public class ProductMapper {
     }
 
     // DTO → Entity (для создания)
-    public ProductEntity toEntity(ProductDto dto, Long userId) {
+    public ProductEntity toEntity(ProductDto dto) {
         ProductEntity entity = new ProductEntity();
         entity.setAccountNumber(dto.getAccountNumber());
         entity.setBalance(dto.getBalance());

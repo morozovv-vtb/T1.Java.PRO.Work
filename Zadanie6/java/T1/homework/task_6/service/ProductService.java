@@ -1,6 +1,7 @@
 package T1.homework.task_6.service;
 
 import T1.homework.task_6.dto.ProductDto;
+import T1.homework.task_6.exception.ProductNotFoundException;
 import T1.homework.task_6.exception.UserNotFoundException;
 import T1.homework.task_6.mapper.ProductMapper;
 import T1.homework.task_6.model.ProductEntity;
@@ -10,9 +11,7 @@ import T1.homework.task_6.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProductService {
@@ -31,15 +30,16 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductDto createProduct(String accountNumber, BigDecimal balance, String productType, Long userId) {
+    public ProductDto createProduct(ProductDto productDto) {
+        Long userId = productDto.getUserId();
         UserEntity user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
 
-        // Используем маппер для создания Entity
-        ProductEntity product = new ProductEntity(accountNumber, balance, productType, user);
-        ProductEntity saved = productRepository.save(product);
+        // Используем маппер для преобразования DTO → Entity
+        ProductEntity product = productMapper.toEntity(productDto/*, userId*/);
+        product.setUser(user);
 
-        // Преобразуем Entity в DTO через маппер
+        ProductEntity saved = productRepository.save(product);
         return productMapper.toDto(saved);
     }
 
@@ -53,17 +53,22 @@ public class ProductService {
         return productMapper.toDtoList(entities);
     }
 
-    public Optional<ProductDto> getProductById(Long productId) {
+    public ProductDto getProductById(Long productId) {
         return productRepository.findByIdWithUser(productId)
-                .map(productMapper::toDto); // Лямбда-ссылка на метод маппера
+                .map(productMapper::toDto)
+                .orElseThrow(() -> new ProductNotFoundException(productId));
     }
 
     public List<ProductDto> getAllProducts() {
-        return productMapper.toDtoList(productRepository.findAllWithUser()); // ✅ Всё в одной строке
+        return productMapper.toDtoList(productRepository.findAllWithUser()); // Всё в одной строке
     }
 
     @Transactional
     public void deleteProduct(Long productId) {
+        // Проверка существования — теперь в сервисе!
+        ProductEntity product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(productId));
+
         productRepository.deleteById(productId);
     }
 }

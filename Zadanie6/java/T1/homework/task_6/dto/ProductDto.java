@@ -3,17 +3,19 @@ package T1.homework.task_6.dto;
 import java.math.BigDecimal;
 
 public class ProductDto {
-
     private Long id;
     private String accountNumber;
     private BigDecimal balance;
     private String productType;
-    private Long userId; // вместо UserEntity
+    private Long userId; // ✅ Добавьте это поле!
 
     // Конструктор
-    public ProductDto() {}
-
-    public ProductDto(Long id, String accountNumber, BigDecimal balance, String productType, Long userId) {
+    public ProductDto(Long id,
+                      String accountNumber,
+                      BigDecimal balance,
+                      String productType,
+                      Long userId
+                     ) {
         this.id = id;
         this.accountNumber = accountNumber;
         this.balance = balance;

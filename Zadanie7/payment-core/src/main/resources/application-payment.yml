@@ -1,0 +1,26 @@
+server:
+  port: 8081
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/java_db
+    username: java_user
+    password: java_pass
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: false # payment-core не управляет БД, только читает
+
+# Настройки для RestTemplate
+payment-core:
+  products-service:
+    url: http://localhost:8080/api/v1/products

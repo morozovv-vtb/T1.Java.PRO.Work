@@ -1,0 +1,8 @@
+CREATE TABLE payments (
+    id BIGSERIAL PRIMARY KEY,
+    product_id BIGINT NOT NULL,
+    amount DECIMAL(19,2) NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);

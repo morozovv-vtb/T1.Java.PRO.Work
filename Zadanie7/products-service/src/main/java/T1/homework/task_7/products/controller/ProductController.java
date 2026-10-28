@@ -20,7 +20,7 @@ public class ProductController {
     public ProductController(ProductService productService,
                              UserService userService,
                              ProductMapper productMapper
-                            ) {
+    ) {
         this.productService = productService;
         this.userService = userService;
         this.productMapper = productMapper;

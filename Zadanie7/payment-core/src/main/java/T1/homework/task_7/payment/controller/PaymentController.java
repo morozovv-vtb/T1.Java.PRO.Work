@@ -15,26 +15,26 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    // Конструкторная инъекция — без @Autowired
+    // Конструкторная инъекция
     public PaymentController(PaymentService paymentService) {
         this.paymentService = paymentService;
     }
 
-    // GET /products/user/{userId} — без изменений
+    // GET /products/user/{userId}
     @GetMapping("/products/user/{userId}")
     public ResponseEntity<List<ProductDto>> getProductsByUserId(@PathVariable Long userId) {
         List<ProductDto> products = paymentService.getProductsByUserId(userId);
         return ResponseEntity.ok(products);
     }
 
-    // GET /products/{productId} — без изменений
+    // GET /products/{productId}
     @GetMapping("/products/{productId}")
     public ResponseEntity<ProductDto> getProductById(@PathVariable Long productId) {
         ProductDto product = paymentService.getProductById(productId);
         return ResponseEntity.ok(product);
     }
 
-    // NEW: POST /execute с @RequestBody
+    // POST
     @PostMapping("/execute")
     public ResponseEntity<String> executePayment(@RequestBody PaymentRequest request) {
         // Извлекаем данные из JSON-тела

@@ -2,10 +2,11 @@ package T1.homework.task_7.payment.service;
 
 import T1.homework.task_7.common.dto.ProductDto;
 import T1.homework.task_7.payment.exception.PaymentCoreException;
+import T1.homework.task_7.payment.exception.ProductNotFoundException;
+import T1.homework.task_7.payment.exception.ProductsServiceUnavailableException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,7 +17,6 @@ public class PaymentService {
     private final RestTemplate restTemplate;
     private final String productsServiceUrl;
 
-    // Конструкторная инъекция — без @Autowired
     public PaymentService(RestTemplate restTemplate, String productsServiceUrl) {
         this.restTemplate = restTemplate;
         this.productsServiceUrl = productsServiceUrl;
@@ -28,7 +28,7 @@ public class PaymentService {
         if (response.getStatusCode().is2xxSuccessful()) {
             return List.of(response.getBody());
         } else {
-            throw new PaymentCoreException("Failed to fetch products from products-service: " + response.getStatusCode());
+            throw new ProductsServiceUnavailableException();
         }
     }
 
@@ -38,7 +38,7 @@ public class PaymentService {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response.getBody();
         } else {
-            throw new PaymentCoreException("Product with id " + productId + " not found");
+            throw new ProductNotFoundException(productId);
         }
     }
 

@@ -9,13 +9,9 @@ public class ProductDto {
     private String productType;
     private Long userId;
 
-    // Конструктор
-    public ProductDto(Long id,
-                      String accountNumber,
-                      BigDecimal balance,
-                      String productType,
-                      Long userId
-    ) {
+    public ProductDto() {}
+
+    public ProductDto(Long id, String accountNumber, BigDecimal balance, String productType, Long userId) {
         this.id = id;
         this.accountNumber = accountNumber;
         this.balance = balance;
@@ -23,7 +19,7 @@ public class ProductDto {
         this.userId = userId;
     }
 
-    // Getters и Setters
+    // Getters and Setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 

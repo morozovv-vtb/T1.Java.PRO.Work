@@ -1,6 +1,7 @@
 package T1.homework.task_7.payment.service;
 
 import T1.homework.task_7.common.dto.ProductDto;
+import T1.homework.task_7.payment.config.ApplicationPaymentConfig;
 import T1.homework.task_7.payment.exception.PaymentCoreException;
 import T1.homework.task_7.payment.exception.ProductNotFoundException;
 import T1.homework.task_7.payment.exception.ProductsServiceUnavailableException;
@@ -17,9 +18,9 @@ public class PaymentService {
     private final RestTemplate restTemplate;
     private final String productsServiceUrl;
 
-    public PaymentService(RestTemplate restTemplate, String productsServiceUrl) {
+    public PaymentService(RestTemplate restTemplate, ApplicationPaymentConfig config) {
         this.restTemplate = restTemplate;
-        this.productsServiceUrl = productsServiceUrl;
+        this.productsServiceUrl = config.getUrl();
     }
 
     public List<ProductDto> getProductsByUserId(Long userId) {

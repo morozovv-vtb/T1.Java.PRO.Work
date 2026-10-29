@@ -8,4 +8,7 @@ public record ErrorResponse (
         String message,
         HttpStatus status,
         ZonedDateTime timestamp
-){}
+){
+    public ErrorResponse(String message, org.springframework.http.HttpStatus httpStatus, ZonedDateTime now) {
+    }
+}

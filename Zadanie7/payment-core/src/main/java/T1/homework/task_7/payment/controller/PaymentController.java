@@ -2,6 +2,7 @@ package T1.homework.task_7.payment.controller;
 
 import T1.homework.task_7.common.dto.ProductDto;
 import T1.homework.task_7.payment.dto.PaymentRequest;
+import T1.homework.task_7.payment.dto.PaymentResponse;
 import T1.homework.task_7.payment.service.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +16,6 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
-    // Конструкторная инъекция
     public PaymentController(PaymentService paymentService) {
         this.paymentService = paymentService;
     }
@@ -34,16 +34,15 @@ public class PaymentController {
         return ResponseEntity.ok(product);
     }
 
-    // POST
+    // POST /execute
     @PostMapping("/execute")
-    public ResponseEntity<String> executePayment(@RequestBody PaymentRequest request) {
-        // Извлекаем данные из JSON-тела
+    public ResponseEntity<PaymentResponse> executePayment(@RequestBody PaymentRequest request) {
         Long productId = request.getProductId();
         BigDecimal amount = request.getAmount();
 
-        // выполняем платеж
         paymentService.executePayment(productId, amount);
 
-        return ResponseEntity.ok("Payment successful");
+        PaymentResponse response = new PaymentResponse("Payment successful", true);
+        return ResponseEntity.ok(response);
     }
 }

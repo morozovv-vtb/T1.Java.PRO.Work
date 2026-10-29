@@ -42,11 +42,10 @@ public class PaymentService {
         }
     }
 
-    public boolean executePayment(Long productId, BigDecimal amount) {
+    public void executePayment(Long productId, BigDecimal amount) {
         ProductDto product = getProductById(productId);
         if (product.getBalance().compareTo(amount) < 0) {
             throw new PaymentCoreException("Insufficient balance on product " + productId);
         }
-        return true;
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.ZonedDateTime;
 
+// Обработка внешних ошибок
 @ControllerAdvice
 public class PaymentCoreExceptionHandler {
 
